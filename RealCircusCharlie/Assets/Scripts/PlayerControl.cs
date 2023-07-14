@@ -29,28 +29,42 @@ public class PlayerControl : MonoBehaviour
     {
         Move();
         Jump();
-       
+
+        Debug.LogFormat("플레이어 위치 : {0}",transform.position);
     }
 
     private void Move()
     {
-        if (Input.GetKey(KeyCode.D))
+        //if (BackgroundLoop.instance == null) { return; }
+
+        //int MoveCount = BackgroundLoop.instance.screenMoveCount;
+        if (transform.position.x >= -10f)
         {
-            transform.Translate(Vector3.right * speed * Time.deltaTime);
-            isWalking = true;
-            lAnimator.SetBool("isWalking", isWalking);
+
+            if (Input.GetKey(KeyCode.D))
+            {
+                transform.Translate(Vector3.right * speed * Time.deltaTime);
+                isWalking = true;
+                lAnimator.SetBool("isWalking", isWalking);
+            }
+            else if (Input.GetKey(KeyCode.A))
+            {
+                transform.Translate(Vector3.left * speed * Time.deltaTime);
+                isWalking = true;
+                lAnimator.SetBool("isWalking", isWalking);
+            }
+            else
+            {
+                isWalking = false;
+                lAnimator.SetBool("isWalking", isWalking);
+            }
         }
-        else if (Input.GetKey(KeyCode.A))
+        else
         {
-            transform.Translate(Vector3.left * speed * Time.deltaTime);
-            isWalking = true;
-            lAnimator.SetBool("isWalking", isWalking);
+            Vector3 newPosition = new Vector3(transform.position.x + 0.5f, transform.position.y, transform.position.z);
+            transform.position = newPosition;
         }
-        else 
-        {
-            isWalking = false;
-            lAnimator.SetBool("isWalking", isWalking);
-        }
+
         
         #region LEGACY
         //float xInput = Input.GetAxis("Horizontal");
@@ -61,6 +75,11 @@ public class PlayerControl : MonoBehaviour
         //lAnimator.SetBool("isWalking", isWalking);
         #endregion
     }
+
+
+
+
+
 
     #region LEGACY
     //private void Jump()
@@ -110,6 +129,23 @@ public class PlayerControl : MonoBehaviour
             { 
                 // 게임 종료 로직   
             }
+        }
+        if (collision.collider.tag == "Money")
+        {
+            GameManger.instance.AddScore(200);   
+        }
+
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Point")
+        {
+            GameManger.instance.AddScore(100);
+        }
+        if (collision.tag == "Fire")
+        {
+            GameManger.instance.AddScore(200);    
         }
     }
 

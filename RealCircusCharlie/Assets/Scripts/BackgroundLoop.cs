@@ -36,13 +36,16 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BackgroundLoop : MonoBehaviour
 {
+    //public static BackgroundLoop instance;
 
     private float width;
     public PlayerControl playerControl;
+    //public int screenMoveCount = 0;
 
     // Start is called before the first frame update
     void Awake()
@@ -50,7 +53,10 @@ public class BackgroundLoop : MonoBehaviour
         //GameObject.Find("offset").GetComponent<CameraMove>();
         BoxCollider2D backGroundCollider = GetComponent<BoxCollider2D>();
         width = backGroundCollider.size.x;
-       
+
+        // 초기화
+        //instance = this;
+
     }
 
     // Update is called once per frame
@@ -60,18 +66,33 @@ public class BackgroundLoop : MonoBehaviour
         //{
         //    Reposition();
         //}
-        Debug.Log(string.Format("플레이어 포지션 {0},", playerControl.gameObject.transform.position.x));
-        if( playerControl.gameObject.transform.position.x > this.transform.position.x + 9f)
+        //Debug.Log(string.Format("플레이어 포지션 {0},", playerControl.gameObject.transform.position.x));
+        if( playerControl.gameObject.transform.position.x > this.transform.position.x + 20f)
         {
-            
+            //Debug.LogFormat("이동할 때 포지션 : {0}",transform.position);
             Reposition();
+            //screenMoveCount++;
         }
+
+        else if (playerControl.gameObject.transform.position.x < this.transform.position.x - 37f)
+        {
+            //Debug.LogFormat("이동할 때 포지션 : {0}",transform.position);
+            BackReposition();
+            //screenMoveCount++;
+        }
+
     }
 
     private void Reposition()
     {
-        Vector2 offset = new Vector2(width * 3, 0f);
-        transform.position = (Vector2)transform.position + offset;
+        Vector3 offset = new Vector3(width * 7.5f, 0f, 0f);
+        transform.position = (Vector3)transform.position + offset;
+    }
+
+    private void BackReposition()
+    {
+        Vector3 offset = new Vector3(-width * 7.5f, 0f, 0f);
+        transform.position = (Vector3)transform.position + offset;
     }
 }
 

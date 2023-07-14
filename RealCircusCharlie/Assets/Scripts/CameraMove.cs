@@ -11,12 +11,17 @@ public class CameraMove : MonoBehaviour
     void Start()
     {
         offset = transform.position.x - player.transform.position.x;
+
+        //Vector3 newVector = transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 targetPosition = new Vector3(player.transform.position.x + offset, transform.position.y, transform.position.z);
-        transform.position = targetPosition;
+        if (player.transform.position.x > -8.21f)
+        { 
+            Vector3 targetPosition = new Vector3(player.transform.position.x + offset, transform.position.y, transform.position.z);
+            transform.position = targetPosition;           
+        }
     }
 }

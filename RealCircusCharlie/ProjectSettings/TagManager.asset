@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Fire
+  - Money
   layers:
   - Default
   - TransparentFX
@@ -46,6 +47,12 @@ TagManager:
   - name: BackGround
     uniqueID: 3934355859
     locked: 0
-  - name: ForeGround
+  - name: Middle
     uniqueID: 1400228251
+    locked: 0
+  - name: Player
+    uniqueID: 1779640977
+    locked: 0
+  - name: Fore
+    uniqueID: 3429657445
     locked: 0
