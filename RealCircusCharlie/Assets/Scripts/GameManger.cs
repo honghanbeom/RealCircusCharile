@@ -3,16 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Drawing;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 public class GameManger : MonoBehaviour
 {
     public static GameManger instance;
     public bool isGameOver = false;
     private int score = 0;
-    private float bonusScore = 5000;
+    private float bonusScore = 10000;
+
+    public GameObject[] life;
     public TextMeshProUGUI scoreTxt;
     public TextMeshProUGUI bonusTxt;
     public TextMeshProUGUI highTxt;
+    public TextMeshProUGUI GameOverTxt;
+    public TextMeshProUGUI GameClearTxt;
+    public TextMeshProUGUI meterTxt;
+    private int lifeImageCount = 2;
+
+    public PlayerControl playerControl; 
+
+
+
 
     void Awake()
     {
@@ -32,6 +45,11 @@ public class GameManger : MonoBehaviour
     {
 
         BonusScore();
+        UserMeter();
+        if (Input.GetKey(KeyCode.R) == true && isGameOver)
+        {
+            SceneManager.LoadScene("PlayScene");
+        }
     }
 
     public void AddScore(int newScore)
@@ -42,6 +60,17 @@ public class GameManger : MonoBehaviour
             scoreTxt.text = "<color=#ff00ff>SCORE</color> : " + score;
         }
     }
+
+    public void UserMeter()
+    {
+        if (!isGameOver)
+        {
+            float meter = playerControl.transform.position.x;
+            meterTxt.text = "<color=#ff00ff>Meter</color> : " + (int)meter +
+                "/<color=#ff00ff>500</color>(m)";
+        }
+    }
+
 
     public void BonusScore()
     {
@@ -58,4 +87,32 @@ public class GameManger : MonoBehaviour
             }
         }
     }
+
+    public void ReGame()
+    {
+        life[lifeImageCount].SetActive(false);
+        lifeImageCount--;
+    }
+
+    public void GameOver()
+    {
+        if (isGameOver)
+        {
+            life[0].SetActive(false);
+            lifeImageCount--;
+            GameOverTxt.gameObject.SetActive(true);
+
+        }
+    }
+
+    public void GameClear()
+    {
+        if (isGameOver)
+        {
+            GameClearTxt.gameObject.SetActive(true);
+
+        }
+    }
+
+
 }

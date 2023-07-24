@@ -9,6 +9,7 @@ public class FireLoopSpwaner : MonoBehaviour
     private float spawnRateMax = 5f;
     private float spawnRate;
     private float timeAfterSpawn;
+    private Vector3 lastSpawnPosition;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,22 +26,28 @@ public class FireLoopSpwaner : MonoBehaviour
     void Spawn()
     {
         timeAfterSpawn += Time.deltaTime;
-        
-        if(timeAfterSpawn > spawnRate)
+
+        if (timeAfterSpawn > spawnRate)
         {
-            timeAfterSpawn = 0f;
-            int loopRandom = Random.Range(0,10);
-            // 8,9 20% 확률로 머니달린 후프 생성
-            if (loopRandom > 7)
-            { 
-                GameObject groundFire = Instantiate(LoopFirePrefab[1], transform.position, transform.rotation);
-            }
-            // 80% 확률로 일반 루프 생성
-            else
+            GameObject groundFire;
+            if (Vector3.Distance(transform.position, lastSpawnPosition) >= 4f)
             {
-                GameObject groundFire = Instantiate(LoopFirePrefab[0], transform.position, transform.rotation);
+                timeAfterSpawn = 0f;
+                int loopRandom = Random.Range(0, 10);
+                // 8,9 20% 확률로 머니달린 후프 생성
+                if (loopRandom > 7)
+                {
+                    groundFire = Instantiate(LoopFirePrefab[1], transform.position, transform.rotation);
+                }
+                // 80% 확률로 일반 루프 생성
+                else
+                {
+                    groundFire = Instantiate(LoopFirePrefab[0], transform.position, transform.rotation);
+                }
+                lastSpawnPosition = groundFire.transform.position;
             }
-            spawnRate = Random.Range(spawnRateMin, spawnRateMax);
+
         }
+            spawnRate = Random.Range(spawnRateMin, spawnRateMax);       
     }
 }

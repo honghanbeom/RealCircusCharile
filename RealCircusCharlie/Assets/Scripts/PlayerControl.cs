@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+enum Sound{ Jump, Point, Dead }
+
 public class PlayerControl : MonoBehaviour
 {
     private float speed = 10f;
@@ -11,33 +13,46 @@ public class PlayerControl : MonoBehaviour
     private bool isGround = false;
     private bool isWalking = false;
     private bool isDead = false;
+    private bool haveLife = false;
+    private int life = 3;
 
+
+    private int meterCount = 0;
+    private Vector3 previousPosition;
 
     public Rigidbody2D rigidBody;
     public Animator cAnimator;
     public Animator lAnimator;
+    public AudioSource audioSource;
+    public AudioClip[] clip;
 
 
     // Start is called before the first frame update
     void Start()
     {
         rigidBody = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();  
     }
 
     // Update is called once per frame
     void Update()
     {
+        previousPosition = rigidBody.position;
         Move();
         Jump();
+        UserPositionCheck();
 
-        Debug.LogFormat("플레이어 위치 : {0}",transform.position);
+        Debug.LogFormat("플레이어 위치 : {0}", transform.position);
+    }
+
+    private void PlaySound(Sound sound)
+    {
+        audioSource.clip = clip[(int)sound];
+        audioSource.Play();
     }
 
     private void Move()
     {
-        //if (BackgroundLoop.instance == null) { return; }
-
-        //int MoveCount = BackgroundLoop.instance.screenMoveCount;
         if (transform.position.x >= -10f)
         {
 
@@ -58,6 +73,12 @@ public class PlayerControl : MonoBehaviour
                 isWalking = false;
                 lAnimator.SetBool("isWalking", isWalking);
             }
+
+        }
+        else if (transform.position.x >= 500f)
+        {
+            GameManger.instance.isGameOver = true;
+            GameManger.instance.GameClear();
         }
         else
         {
@@ -75,8 +96,6 @@ public class PlayerControl : MonoBehaviour
         //lAnimator.SetBool("isWalking", isWalking);
         #endregion
     }
-
-
 
 
 
@@ -103,9 +122,23 @@ public class PlayerControl : MonoBehaviour
             {
                 rigidBody.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
                 lAnimator.SetTrigger("Jump"); // 점프 트리거를 활성화하여 점프 애니메이션을 재생합니다.
+                PlaySound(Sound.Jump);
             }
         }
     }
+
+    private void UserPositionCheck()
+    {
+        Vector3 currentPosition = rigidBody.position;
+        float distance = Mathf.Abs(currentPosition.x - previousPosition.x);
+
+        if (distance >= 50f)
+        {
+            meterCount++;
+            previousPosition = currentPosition;
+        }
+    }
+
 
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -120,19 +153,30 @@ public class PlayerControl : MonoBehaviour
             isDead = true;
             lAnimator.SetBool("isDead", isDead);
             cAnimator.SetBool("isDead", isDead);
+            transform.Translate(50 * meterCount - 10f, -2f, 0f);
             playerLife--;
             if (playerLife != 0)
-            { 
-                // 게임 재시작 로직    
+            {
+                haveLife = true;
+                PlaySound(Sound.Dead);
+                GameManger.instance.ReGame();
+                lAnimator.SetBool("haveLife", haveLife);
+                cAnimator.SetBool("haveLife", haveLife);
+
             }
             if (playerLife == 0)
-            { 
-                // 게임 종료 로직   
+            {
+                GameManger.instance.isGameOver = true;
+                gameObject.SetActive(false);
+                GameManger.instance.GameOver();
+
             }
         }
         if (collision.collider.tag == "Money")
         {
-            GameManger.instance.AddScore(200);   
+            GameManger.instance.AddScore(200);
+            PlaySound(Sound.Point);
+
         }
 
     }
@@ -142,10 +186,14 @@ public class PlayerControl : MonoBehaviour
         if (collision.tag == "Point")
         {
             GameManger.instance.AddScore(100);
+            PlaySound(Sound.Point);
+
         }
         if (collision.tag == "Fire")
         {
-            GameManger.instance.AddScore(200);    
+            GameManger.instance.AddScore(100);
+            PlaySound(Sound.Point);
+
         }
     }
 
